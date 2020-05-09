@@ -96,7 +96,31 @@ server.delete('/api/users/:id', (req, res) => {
 });
 
 server.put('/api/users/:id', (req, res) => {
-  console.log('put request params and body: ', req.params, req.body);
+  //console.log('put request params and body: ', req.params, req.body);
+  try {
+    const updatedUserInfo = req.body;
+    const requestedUser = users.find(user => {
+      return (user.id === parseInt(req.params.id));
+    });
+
+    if (!requestedUser) {
+      res.status(404).json({
+        errorMessage: "The user with the specified ID does not exist."
+      });
+    } else if(!updatedUserInfo.name || !updatedUserInfo.bio) {
+      res.status(400).json({
+        errorMessage: "Please provide name and bio for the user."
+      });
+    } else {
+      requestedUser.name = updatedUserInfo.name;
+      requestedUser.bio = updatedUserInfo.bio;
+      res.status(200).json(requestedUser);
+    }
+  } catch(err) {
+    res.status(500).json({
+      errorMessage: "The user information could not be modified."
+    });
+  }
 
 });
 
